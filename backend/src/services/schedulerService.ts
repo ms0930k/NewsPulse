@@ -87,7 +87,7 @@ cron.schedule("* * * * *", async () => {
       try {
         await sendEmail(
           user.email,
-          "📰 Your Daily NewsPulse Digest",
+          "📰 Your Daily News93 Digest",
           newsItems
         );
       } catch (e) {

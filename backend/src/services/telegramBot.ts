@@ -13,7 +13,7 @@ bot.on("message", (msg) => {
   if (msg.text === "/start") {
     bot.sendMessage(
       chatId,
-      "👋 Welcome to NewsPulse Bot!\n\nWe’ll send you scheduled news updates here."
+      "👋 Welcome to News93 Bot!\n\nWe’ll send you scheduled news updates here."
     );
   }
 });

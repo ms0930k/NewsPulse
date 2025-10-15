@@ -61,7 +61,7 @@ bot.onText(/\/start/, async (msg) => {
     // New user → ask for email
     await bot.sendMessage(
       chatId,
-      "👋 Welcome to NewsPulse! Please enter your email to register:"
+      "👋 Welcome to News93! Please enter your email to register:"
     );
     userSteps[chatId] = "awaiting_email";
   }
@@ -240,7 +240,7 @@ bot.on("callback_query", async (query) => {
       { telegram_id: chatId.toString() },
       { subscription_status: false }
     );
-    bot.sendMessage(chatId, "❌ You have been unsubscribed from NewsPulse.");
+    bot.sendMessage(chatId, "❌ You have been unsubscribed from News93.");
     return bot.answerCallbackQuery(query.id);
   }
 });
