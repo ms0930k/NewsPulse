@@ -23,7 +23,7 @@ export async function sendEmail(to: string, subject: string, newsItems: NewsItem
   // Build professional HTML email
   const html = `
   <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.5; padding: 20px;">
-    <h2 style="color: #2c3e50;">📰 Your Daily NewsPulse Digest</h2>
+    <h2 style="color: #2c3e50;">📰 Your Daily News93 Digest</h2>
     <p>Hello <b>${to}</b>,</p>
     <p>Here’s your personalized news roundup for today:</p>
 
@@ -46,13 +46,13 @@ export async function sendEmail(to: string, subject: string, newsItems: NewsItem
       )
       .join("")}
 
-    <p style="margin-top: 30px;">Stay informed,<br><b>NewsPulse Team</b></p>
+    <p style="margin-top: 30px;">Stay informed,<br><b>News93 Team</b></p>
   </div>
   `;
 
   try {
     await transporter.sendMail({
-      from: `"NewsPulse" <${process.env.EMAIL_USER}>`,
+      from: `"News93" <${process.env.EMAIL_USER}>`,
       to,
       subject,
       html,
