@@ -8,6 +8,7 @@ import { enhanceNewsArticle } from "./geminiService"; // Gemini integration
 interface EmailGroup {
   user: any;
   summaries: any[];
+  schedules: any[];
 }
 
 // Run every minute
@@ -41,6 +42,7 @@ cron.schedule("* * * * *", async () => {
       if (!uid) continue;
 
       // Telegram (send one-by-one)
+      let telegramSent = false;
       if (sched.send_method?.includes("telegram") && user.telegram_id) {
         try {
           const message = `📰 ${escapeTelegramMarkdown(
@@ -49,6 +51,7 @@ cron.schedule("* * * * *", async () => {
             summary.source_url
           }`;
           await sendTelegramMessage(user.telegram_id, message);
+          telegramSent = true;
         } catch (e) {
           console.error("❌ Telegram send failed:", e);
         }
@@ -57,7 +60,7 @@ cron.schedule("* * * * *", async () => {
       // Email (group for digest)
       if (sched.send_method?.includes("email") && user.email) {
         if (!emailGroups[uid]) {
-          emailGroups[uid] = { user, summaries: [] };
+          emailGroups[uid] = { user, summaries: [], schedules: [] };
         }
         emailGroups[uid].summaries.push({
           title: enhancedTitle,
@@ -65,11 +68,14 @@ cron.schedule("* * * * *", async () => {
           source_url: summary.source_url,
           image_url: summary.image_url || "",
         });
+        emailGroups[uid].schedules.push(sched);
       }
 
-      // Mark schedule as sent
-      sched.status = true;
-      await sched.save();
+      // Mark as sent only if delivery completed for all requested channels
+      if (telegramSent && !sched.send_method?.includes("email")) {
+        sched.status = true;
+        await sched.save();
+      }
     }
 
     // Send grouped emails
@@ -85,11 +91,16 @@ cron.schedule("* * * * *", async () => {
       }));
 
       try {
-        await sendEmail(
-          user.email,
-          "📰 Your Daily News93 Digest",
-          newsItems
-        );
+        await sendEmail(user.email, "📰 Your Daily News93 Digest", newsItems);
+        // Mark schedules associated with this email group as sent
+        for (const sched of group.schedules || []) {
+          try {
+            sched.status = true;
+            await sched.save();
+          } catch (e) {
+            console.error("❌ Failed to mark schedule as sent:", sched._id, e);
+          }
+        }
       } catch (e) {
         console.error("❌ Email send failed for", user.email, e);
       }

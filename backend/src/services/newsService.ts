@@ -45,7 +45,7 @@ export async function fetchAndScheduleNews(forUserId?: string) {
               send_method:
                 user.delivery_method === "both"
                   ? ["telegram", "email"]
-                  : user.delivery_method,
+                  : [user.delivery_method],
             });
           }
         }

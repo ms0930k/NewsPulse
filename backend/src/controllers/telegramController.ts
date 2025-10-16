@@ -1,5 +1,6 @@
 import { Request,Response } from "express";
 import { sendTelegramMessage } from "../services/telegramService";
+import { escapeTelegramMarkdown } from "./telegramHelper";
 import User from "../models/User";
 import NewsSummary from "../models/NewsSummary";
 
@@ -20,8 +21,8 @@ export const sendTestMessage = async (req: Request, res: Response) => {
         if (!summary) return res.status(404).json({ error: "Summary not found" });
         if (!user.telegram_id) return res.status(400).json({ error: "User has no Telegram ID" });
 
-        // Build message
-        const message = `📰 *${summary.category}*\n\n${summary.summary_text}\n\n[Read More](${summary.source_url})`;
+        // Build message for MarkdownV2, escape dynamic content and include raw URL
+        const message = `📰 ${escapeTelegramMarkdown(`*${summary.category || "News"}*`)}\n\n${escapeTelegramMarkdown(summary.summary_text)}\n\n🔗 ${summary.source_url}`;
 
         await sendTelegramMessage(user.telegram_id, message);
 
